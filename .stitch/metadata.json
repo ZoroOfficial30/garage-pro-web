@@ -1,0 +1,89 @@
+﻿{
+  "projectId": "10109041327133690116",
+  "projectTitle": "Garage Accounting Pro",
+  "mainCurrency": {
+    "code": "OMR",
+    "symbol": "ر.ع.",
+    "displayName": "Omani Rial",
+    "decimalPlaces": 3,
+    "format": "OMR #,##0.000"
+  },
+  "designSystem": {
+    "assetId": "assets/10468624953666122558",
+    "displayName": "Garage Accounting Sunlight DS",
+    "colorMode": "LIGHT",
+    "primaryColor": "#0284C7",
+    "secondaryColor": "#059669",
+    "tertiaryColor": "#E11D48",
+    "warningColor": "#D97706",
+    "neutralColor": "#F8FAFC",
+    "headlineFont": "PLUS_JAKARTA_SANS",
+    "bodyFont": "PLUS_JAKARTA_SANS",
+    "roundness": "ROUND_TWELVE"
+  },
+  "screens": [
+    {
+      "id": "e0165eaadc0b4fed8e79689ae5e8da7e",
+      "index": 1,
+      "slug": "01_home_voice_chat",
+      "title": "Workshop Ledger Feed (Home/Voice Chat)",
+      "deviceType": "MOBILE",
+      "htmlFile": ".stitch/designs/01_home_voice_chat.html",
+      "pngFile": ".stitch/designs/01_home_voice_chat.png"
+    },
+    {
+      "id": "ad239639832b4ae58d30e4dc45233eb7",
+      "index": 2,
+      "slug": "02_customers_list",
+      "title": "Customer Accounts & Dues Directory",
+      "deviceType": "MOBILE",
+      "htmlFile": ".stitch/designs/02_customers_list.html",
+      "pngFile": ".stitch/designs/02_customers_list.png"
+    },
+    {
+      "id": "82868d48119c4244b227daae2c2f7fab",
+      "index": 3,
+      "slug": "03_customer_detail_history",
+      "title": "Customer Profile & Transaction History",
+      "deviceType": "MOBILE",
+      "htmlFile": ".stitch/designs/03_customer_detail_history.html",
+      "pngFile": ".stitch/designs/03_customer_detail_history.png"
+    },
+    {
+      "id": "e0862854e4af4f0b9128c16c8ec1b361",
+      "index": 4,
+      "slug": "04_stock_inventory",
+      "title": "Parts & Inventory Management",
+      "deviceType": "MOBILE",
+      "htmlFile": ".stitch/designs/04_stock_inventory.html",
+      "pngFile": ".stitch/designs/04_stock_inventory.png"
+    },
+    {
+      "id": "ad16927fa8c147e4be9b8df1f912eb4c",
+      "index": 5,
+      "slug": "05_expenses",
+      "title": "Workshop Expenses Tracker",
+      "deviceType": "MOBILE",
+      "htmlFile": ".stitch/designs/05_expenses.html",
+      "pngFile": ".stitch/designs/05_expenses.png"
+    },
+    {
+      "id": "0e10e9150022418392eaab5574758def",
+      "index": 6,
+      "slug": "06_dashboard",
+      "title": "Executive Workshop Dashboard",
+      "deviceType": "MOBILE",
+      "htmlFile": ".stitch/designs/06_dashboard.html",
+      "pngFile": ".stitch/designs/06_dashboard.png"
+    },
+    {
+      "id": "2253de5233dd44dda1a62922e8ff494b",
+      "index": 7,
+      "slug": "07_settings",
+      "title": "Workshop Settings & Configuration",
+      "deviceType": "MOBILE",
+      "htmlFile": ".stitch/designs/07_settings.html",
+      "pngFile": ".stitch/designs/07_settings.png"
+    }
+  ]
+}

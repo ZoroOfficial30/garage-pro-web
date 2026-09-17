@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>Customer Profile - Karim Chowdhury</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+              "on-surface": "#191c1e",
+              "surface-tint": "#006398",
+              "error": "#ba1a1a",
+              "background": "#f7f9fb",
+              "tertiary-fixed-dim": "#ffb3b6",
+              "surface-bright": "#f7f9fb",
+              "inverse-primary": "#93ccff",
+              "tertiary-container": "#e21e49",
+              "surface-container-highest": "#e0e3e5",
+              "on-secondary-fixed-variant": "#005137",
+              "surface": "#f7f9fb",
+              "on-surface-variant": "#3f4850",
+              "inverse-surface": "#2d3133",
+              "on-error": "#ffffff",
+              "on-primary": "#ffffff",
+              "on-tertiary-container": "#fffbff",
+              "primary-fixed-dim": "#93ccff",
+              "primary-fixed": "#cce5ff",
+              "tertiary": "#ba0035",
+              "surface-container": "#eceef0",
+              "surface-variant": "#e0e3e5",
+              "outline": "#707881",
+              "outline-variant": "#bfc7d2",
+              "surface-container-high": "#e6e8ea",
+              "on-secondary-fixed": "#002114",
+              "primary": "#006194",
+              "on-tertiary": "#ffffff",
+              "secondary-container": "#82f5c1",
+              "on-primary-fixed-variant": "#004b73",
+              "on-secondary-container": "#00714e",
+              "on-primary-fixed": "#001d31",
+              "tertiary-fixed": "#ffdada",
+              "error-container": "#ffdad6",
+              "surface-dim": "#d8dadc",
+              "secondary-fixed": "#85f8c4",
+              "secondary": "#006c4a",
+              "primary-container": "#007bb9",
+              "on-tertiary-fixed": "#40000c",
+              "on-tertiary-fixed-variant": "#920028",
+              "secondary-fixed-dim": "#68dba9",
+              "surface-container-low": "#f2f4f6",
+              "surface-container-lowest": "#ffffff",
+              "on-primary-container": "#fdfcff",
+              "on-background": "#191c1e",
+              "on-secondary": "#ffffff",
+              "inverse-on-surface": "#eff1f3",
+              "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+              "DEFAULT": "0.25rem",
+              "lg": "0.5rem",
+              "xl": "0.75rem",
+              "full": "9999px"
+            },
+            "spacing": {
+              "safe": "env(safe-area-inset-bottom)"
+            },
+            "fontFamily": {
+              "headline": [
+                "Plus Jakarta Sans"
+              ],
+              "display": [
+                "Plus Jakarta Sans"
+              ],
+              "body": [
+                "Plus Jakarta Sans"
+              ],
+              "label": [
+                "Public Sans"
+              ]
+            },
+            "fontSize": {}
+          },
+        },
+      }
+    </script>
+<style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .pt-safe { padding-top: env(safe-area-inset-top); }
+        body { -webkit-tap-highlight-color: transparent; }
+        
+        /* Smooth scrolling for the ledger */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px) translateX(-50%); }
+            to { opacity: 1; transform: translateY(0) translateX(-50%); }
+        }
+        .snackbar-enter {
+            animation: slideUpFade 0.3s cubic-bezier(0.2, 0, 0, 1) forwards;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body min-h-screen flex flex-col pt-safe pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim fixed top-0 w-full z-50 border-b border-outline-variant dark:border-outline shadow-sm h-16 pt-safe">
+<div class="flex items-center justify-between px-4 h-full">
+<button aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full text-primary dark:text-primary-fixed hover:bg-surface-container-high transition-colors active:scale-95 duration-100">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="text-xl font-headline font-bold text-primary dark:text-primary-fixed flex-1 text-center truncate px-2">Customer Profile</h1>
+<button aria-label="Customer Profile Avatar" class="w-10 h-10 flex items-center justify-center rounded-full overflow-hidden border border-outline-variant hover:bg-surface-container-high transition-colors active:scale-95 duration-100">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a middle-aged South Asian man with short dark hair and a neat beard, wearing a crisp light blue button-down shirt. He has a warm, approachable expression. The lighting is bright and evenly distributed, creating a modern, clean light-mode aesthetic against a very pale grey seamless background. Shot in high resolution, photorealistic style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB38pA_PAGN6wpy85fZsJHu9_-Mu0QYp779VFe3h4T8_-WpA8RtsIvf3P_Vhi9xofh3aLhZ1VkA6-v2rNyinL_JVNMkABoTjIGYfKqgw6VfVyYc6hf2owAn5oBbLZr0xsqghU9UPfhqiASzICQuwWj2ITlQVMBw4WZgjL3bdmwXicRVkqH3rj9A7w3D_s5XoDuqUUcp4kLbsZYXUGzwv-EjU4Ar9vC5MKYX5-7A-hUSNI3Qrm5Eecj5_oIFbjLv_w5srDMn89Wt8miV"/>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 mt-16 px-4 md:px-8 max-w-4xl mx-auto w-full flex flex-col gap-6 py-6">
+<!-- Profile Summary (Glassmorphism-inspired Bento Card) -->
+<section class="bg-surface-container-lowest border border-outline-variant/50 rounded-xl p-5 shadow-sm relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary-fixed/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h2 class="text-2xl font-headline font-bold text-on-surface">Karim Chowdhury</h2>
+<span class="px-2 py-0.5 bg-tertiary-container text-on-tertiary-container text-xs font-bold rounded-full font-label uppercase tracking-wider shadow-sm">VIP</span>
+</div>
+<div class="flex flex-col gap-2 mt-3">
+<div class="flex items-center gap-2 text-on-surface-variant font-medium text-sm">
+<span class="material-symbols-outlined text-base" data-icon="phone" style="font-variation-settings: 'FILL' 1;">phone</span>
+<span>+880 1711-234567</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant font-medium text-sm">
+<span class="material-symbols-outlined text-base" data-icon="directions_car" style="font-variation-settings: 'FILL' 1;">directions_car</span>
+<span>Toyota Corolla 2019 <span class="text-outline font-normal text-xs bg-surface-container px-1.5 py-0.5 rounded border border-outline-variant/30 ml-1">Dhaka Metro-GA 23-8910</span></span>
+</div>
+</div>
+</div>
+<!-- Quick Actions Vertical -->
+<div class="flex flex-col gap-2">
+<button aria-label="Call" class="w-10 h-10 rounded-full bg-primary-container/10 text-primary hover:bg-primary-container/20 flex items-center justify-center transition-colors shadow-sm active:scale-95">
+<span class="material-symbols-outlined" data-icon="call" style="font-variation-settings: 'FILL' 1;">call</span>
+</button>
+<button aria-label="WhatsApp" class="w-10 h-10 rounded-full bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 flex items-center justify-center transition-colors shadow-sm active:scale-95">
+<!-- Using chat icon as placeholder for WhatsApp in material icons -->
+<span class="material-symbols-outlined" data-icon="chat" style="font-variation-settings: 'FILL' 1;">chat</span>
+</button>
+<button aria-label="Edit Profile" class="w-10 h-10 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-variant flex items-center justify-center transition-colors shadow-sm active:scale-95">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Outstanding Due Hero Card -->
+<section class="bg-primary text-on-primary rounded-xl p-6 shadow-lg relative overflow-hidden flex flex-col justify-between min-h-[160px]">
+<!-- Decorative elements -->
+<div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+<div class="absolute -left-10 -bottom-10 w-32 h-32 bg-secondary-container/20 rounded-full blur-xl"></div>
+<div class="relative z-10 flex flex-col gap-1">
+<span class="text-primary-fixed font-label text-xs font-bold tracking-wider uppercase opacity-90">CURRENT OUTSTANDING DUE</span>
+<div class="flex items-baseline gap-2">
+<span class="text-4xl md:text-5xl font-headline font-extrabold tracking-tight">$450.00</span>
+</div>
+</div>
+<div class="relative z-10 mt-6 pt-4 border-t border-primary-fixed/20 flex flex-wrap gap-x-4 gap-y-2 text-xs font-medium text-primary-fixed-dim">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="receipt_long">receipt_long</span>
+<span>Total Lifetime Billing: <strong class="text-white font-semibold">$1,650.00</strong></span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="payments">payments</span>
+<span>Lifetime Paid: <strong class="text-white font-semibold">$1,200.00</strong></span>
+</div>
+<div class="flex items-center gap-1 w-full md:w-auto mt-1 md:mt-0 opacity-80">
+<span class="material-symbols-outlined text-sm" data-icon="event">event</span>
+<span>Last visit: Sep 5, 2026</span>
+</div>
+</div>
+</section>
+<!-- Primary Actions Group -->
+<section class="flex flex-col md:flex-row gap-3">
+<button class="flex-1 bg-secondary text-on-secondary rounded-xl py-3 px-4 font-bold text-sm flex items-center justify-center gap-2 shadow-sm hover:bg-secondary/90 transition-colors active:scale-[0.98] duration-100">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+                Settle Payment
+            </button>
+<button class="flex-1 bg-surface-container-high text-on-surface rounded-xl py-3 px-4 font-bold text-sm flex items-center justify-center gap-2 shadow-sm hover:bg-surface-variant transition-colors border border-outline-variant/30 active:scale-[0.98] duration-100">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+                Add Due / Bill
+            </button>
+<button class="flex-1 bg-surface-container-high text-on-surface rounded-xl py-3 px-4 font-bold text-sm flex items-center justify-center gap-2 shadow-sm hover:bg-surface-variant transition-colors border border-outline-variant/30 active:scale-[0.98] duration-100">
+<span class="material-symbols-outlined" data-icon="ios_share">ios_share</span>
+                Share Statement
+            </button>
+</section>
+<!-- Transaction Ledger -->
+<section class="flex flex-col gap-4 mt-2">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-headline font-bold text-on-surface">Transaction History (4)</h3>
+<!-- Filter Pills -->
+<div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+<button class="bg-primary-container text-on-primary-container px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shadow-sm">All</button>
+<button class="bg-surface-container text-on-surface-variant px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border border-outline-variant/30 hover:bg-surface-container-high transition-colors">Invoices</button>
+<button class="bg-surface-container text-on-surface-variant px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border border-outline-variant/30 hover:bg-surface-container-high transition-colors">Payments</button>
+</div>
+</div>
+<!-- Ledger List (Bento-style list items) -->
+<div class="flex flex-col gap-3">
+<!-- Item 1: Debit -->
+<div class="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-4 shadow-sm flex flex-col gap-3 relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-error"></div>
+<div class="flex justify-between items-start pl-2">
+<div class="flex flex-col gap-1">
+<span class="text-xs text-on-surface-variant font-medium">Sep 05, 2026</span>
+<strong class="text-sm text-on-surface font-headline leading-tight pr-4">Job #104: Brake Pad Replacement &amp; Rotor Skimming</strong>
+</div>
+<div class="flex flex-col items-end gap-1 text-right shrink-0">
+<span class="text-error font-bold text-base whitespace-nowrap">+$150.00</span>
+<span class="text-[10px] bg-error-container text-on-error-container px-1.5 py-0.5 rounded font-bold uppercase">Debit</span>
+</div>
+</div>
+<div class="border-t border-outline-variant/20 pt-2 pl-2 flex justify-between items-center text-xs text-on-surface-variant">
+<span>Running Balance</span>
+<strong class="text-on-surface">$450.00</strong>
+</div>
+</div>
+<!-- Item 2: Credit -->
+<div class="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-4 shadow-sm flex flex-col gap-3 relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary"></div>
+<div class="flex justify-between items-start pl-2">
+<div class="flex flex-col gap-1">
+<span class="text-xs text-on-surface-variant font-medium">Aug 20, 2026</span>
+<strong class="text-sm text-on-surface font-headline leading-tight pr-4">Cash Payment Collected</strong>
+</div>
+<div class="flex flex-col items-end gap-1 text-right shrink-0">
+<span class="text-secondary font-bold text-base whitespace-nowrap">-$200.00</span>
+<span class="text-[10px] bg-secondary-container text-on-secondary-container px-1.5 py-0.5 rounded font-bold uppercase">Credit</span>
+</div>
+</div>
+<div class="border-t border-outline-variant/20 pt-2 pl-2 flex justify-between items-center text-xs text-on-surface-variant">
+<span>Running Balance</span>
+<strong class="text-on-surface">$300.00</strong>
+</div>
+</div>
+<!-- Item 3: Debit -->
+<div class="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-4 shadow-sm flex flex-col gap-3 relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-error"></div>
+<div class="flex justify-between items-start pl-2">
+<div class="flex flex-col gap-1">
+<span class="text-xs text-on-surface-variant font-medium">Aug 15, 2026</span>
+<strong class="text-sm text-on-surface font-headline leading-tight pr-4">Job #089: 40k km Service &amp; Castrol Oil</strong>
+</div>
+<div class="flex flex-col items-end gap-1 text-right shrink-0">
+<span class="text-error font-bold text-base whitespace-nowrap">+$500.00</span>
+<span class="text-[10px] bg-error-container text-on-error-container px-1.5 py-0.5 rounded font-bold uppercase">Debit</span>
+</div>
+</div>
+<div class="border-t border-outline-variant/20 pt-2 pl-2 flex justify-between items-center text-xs text-on-surface-variant">
+<span>Running Balance</span>
+<strong class="text-on-surface">$500.00</strong>
+</div>
+</div>
+<!-- Item 4: Paid Flat -->
+<div class="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-4 shadow-sm flex flex-col gap-3 relative overflow-hidden opacity-70 hover:opacity-100 transition-opacity">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-outline"></div>
+<div class="flex justify-between items-start pl-2">
+<div class="flex flex-col gap-1">
+<span class="text-xs text-on-surface-variant font-medium">Jul 10, 2026</span>
+<strong class="text-sm text-on-surface font-headline leading-tight pr-4">AC Gas Refill &amp; Cabin Filter</strong>
+</div>
+<div class="flex flex-col items-end gap-1 text-right shrink-0">
+<span class="text-on-surface-variant font-bold text-base whitespace-nowrap">$120.00</span>
+<span class="text-[10px] bg-surface-container text-on-surface-variant px-1.5 py-0.5 rounded font-bold uppercase border border-outline-variant/50">Paid</span>
+</div>
+</div>
+<div class="border-t border-outline-variant/20 pt-2 pl-2 flex justify-between items-center text-xs text-on-surface-variant">
+<span>Running Balance</span>
+<strong class="text-on-surface-variant">$0.00</strong>
+</div>
+</div>
+</div>
+<button class="w-full py-3 mt-2 text-sm font-bold text-primary hover:bg-primary-container/10 rounded-xl transition-colors">
+                Load More Transactions
+            </button>
+</section>
+</main>
+<!-- Snackbar (Positioned above Bottom Nav if present, or absolute bottom) -->
+<div class="fixed bottom-24 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-sm bg-inverse-surface text-inverse-on-surface rounded-xl p-4 flex items-center justify-between shadow-xl z-[60] snackbar-enter">
+<span class="text-sm font-medium">Recorded $200 cash payment</span>
+<button class="text-inverse-primary font-bold text-sm uppercase tracking-wider hover:bg-inverse-primary/10 px-2 py-1 rounded transition-colors">
+            UNDO (5s)
+        </button>
+</div>
+<!-- BottomNavBar (Hidden on md and up as per guidelines, though the prompt requests it. We implement responsive hiding) -->
+<nav class="bg-surface-container dark:bg-surface-container-lowest fixed bottom-0 w-full z-50 rounded-t-xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)] flex justify-around items-center h-20 pb-safe px-2 md:hidden">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline p-2 hover:bg-surface-variant/50 transition-all duration-200 ease-in-out rounded-lg">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label text-[10px] font-medium mt-1">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-secondary-container dark:bg-on-secondary-fixed-variant text-on-secondary-container dark:text-secondary-fixed rounded-full px-4 py-1 transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-label text-[10px] font-bold mt-1">Customers</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline p-2 hover:bg-surface-variant/50 transition-all duration-200 ease-in-out rounded-lg">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label text-[10px] font-medium mt-1">Stock</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline p-2 hover:bg-surface-variant/50 transition-all duration-200 ease-in-out rounded-lg">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-label text-[10px] font-medium mt-1">Expenses</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline p-2 hover:bg-surface-variant/50 transition-all duration-200 ease-in-out rounded-lg">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+<span class="font-label text-[10px] font-medium mt-1">More</span>
+</button>
+</nav>
+</body></html>

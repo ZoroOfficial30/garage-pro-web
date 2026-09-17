@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Parts &amp; Inventory - Apex Auto Workshop</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;900&amp;family=Public+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+              "error-container": "#ffdad6",
+              "background": "#f7f9fb",
+              "surface-container-low": "#f2f4f6",
+              "on-primary-container": "#fdfcff",
+              "surface-container-highest": "#e0e3e5",
+              "on-primary-fixed": "#001d31",
+              "on-tertiary-container": "#fffbff",
+              "on-error-container": "#93000a",
+              "on-surface": "#191c1e",
+              "surface-bright": "#f7f9fb",
+              "tertiary-fixed-dim": "#ffb3b6",
+              "surface": "#f7f9fb",
+              "surface-tint": "#006398",
+              "primary-container": "#007bb9",
+              "on-tertiary-fixed": "#40000c",
+              "on-tertiary": "#ffffff",
+              "inverse-on-surface": "#eff1f3",
+              "on-background": "#191c1e",
+              "outline-variant": "#bfc7d2",
+              "on-secondary-fixed-variant": "#005137",
+              "outline": "#707881",
+              "on-secondary": "#ffffff",
+              "secondary-container": "#82f5c1",
+              "surface-container-lowest": "#ffffff",
+              "surface-variant": "#e0e3e5",
+              "primary-fixed": "#cce5ff",
+              "surface-container-high": "#e6e8ea",
+              "surface-container": "#eceef0",
+              "secondary-fixed": "#85f8c4",
+              "on-primary-fixed-variant": "#004b73",
+              "primary-fixed-dim": "#93ccff",
+              "tertiary": "#ba0035",
+              "secondary": "#006c4a",
+              "surface-dim": "#d8dadc",
+              "on-tertiary-fixed-variant": "#920028",
+              "error": "#ba1a1a",
+              "primary": "#006194",
+              "secondary-fixed-dim": "#68dba9",
+              "on-secondary-fixed": "#002114",
+              "inverse-primary": "#93ccff",
+              "on-error": "#ffffff",
+              "on-surface-variant": "#3f4850",
+              "on-primary": "#ffffff",
+              "tertiary-fixed": "#ffdada",
+              "tertiary-container": "#e21e49",
+              "on-secondary-container": "#00714e",
+              "inverse-surface": "#2d3133"
+            },
+            "borderRadius": {
+              "DEFAULT": "0.25rem",
+              "lg": "0.5rem",
+              "xl": "0.75rem",
+              "full": "9999px"
+            },
+            "spacing": {},
+            "fontFamily": {
+              "headline": [
+                "Plus Jakarta Sans"
+              ],
+              "display": [
+                "Plus Jakarta Sans"
+              ],
+              "body": [
+                "Plus Jakarta Sans"
+              ],
+              "label": [
+                "Public Sans"
+              ]
+            },
+            "fontSize": {}
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 1;
+        }
+        /* Hide scrollbar for brand pills */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body pb-24 antialiased selection:bg-primary selection:text-on-primary">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-surface border-b border-outline-variant z-40 transition-shadow" id="mainHeader">
+<div class="flex items-center justify-between px-4 h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<button class="p-2 -ml-2 rounded-full hover:bg-surface-container-high transition-colors active:scale-95 duration-100 text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined">garage</span>
+</button>
+<div class="flex flex-col">
+<h1 class="text-lg font-headline font-black text-primary tracking-tight leading-none">Apex Auto Workshop</h1>
+<span class="text-xs font-label text-on-surface-variant font-medium mt-0.5">Parts &amp; Inventory • 148 SKUs in Stock</span>
+</div>
+</div>
+<button class="p-2 -mr-2 rounded-full hover:bg-surface-container-high transition-colors active:scale-95 duration-100 text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 space-y-8">
+<!-- Search Bar -->
+<section class="relative max-w-3xl mx-auto">
+<div class="relative flex items-center w-full h-[56px] rounded-full bg-surface-container-highest shadow-sm focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 transition-all">
+<div class="pl-4 pr-3 text-on-surface-variant flex items-center pointer-events-none">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-on-surface-variant/70 text-base font-medium h-full outline-none pr-12 rounded-full" placeholder="Scan barcode or search part name, OEM #..." type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-colors flex items-center justify-center active:scale-90">
+<span class="material-symbols-outlined">barcode_scanner</span>
+</button>
+</div>
+</section>
+<!-- Low Stock Alert Carousel -->
+<section class="mb-8">
+<h2 class="text-sm font-label font-bold text-on-surface-variant uppercase tracking-wider mb-3">Action Required</h2>
+<div class="flex overflow-x-auto no-scrollbar gap-4 pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
+<!-- Alert 1: Out of Stock -->
+<div class="min-w-[280px] max-w-[320px] sm:min-w-[320px] flex-shrink-0 snap-center bg-error-container border border-error/20 rounded-xl p-4 flex flex-col justify-between shadow-sm">
+<div class="flex items-start gap-3 mb-4">
+<div class="p-2 bg-error text-on-error rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-xl">warning</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-on-error-container text-sm leading-tight">Bosch Front Brake Pads</h3>
+<p class="text-error font-semibold text-xs mt-1">0 sets left (OUT OF STOCK)</p>
+</div>
+</div>
+<button class="w-full h-12 bg-error hover:bg-error/90 text-on-error font-bold rounded-lg transition-colors active:scale-[0.98] flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">shopping_cart</span>
+                        Reorder Now
+                    </button>
+</div>
+<!-- Alert 2: Low Stock -->
+<div class="min-w-[280px] max-w-[320px] sm:min-w-[320px] flex-shrink-0 snap-center bg-[#fef3c7] border border-[#f59e0b]/20 rounded-xl p-4 flex flex-col justify-between shadow-sm">
+<div class="flex items-start gap-3 mb-4">
+<div class="p-2 bg-[#d97706] text-white rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-xl">inventory_2</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-[#92400e] text-sm leading-tight">Castrol 5W-30 Engine Oil</h3>
+<p class="text-[#b45309] font-semibold text-xs mt-1">2 Qts left (Min required: 8)</p>
+</div>
+</div>
+<button class="w-full h-12 bg-[#d97706] hover:bg-[#b45309] text-white font-bold rounded-lg transition-colors active:scale-[0.98] flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">shopping_cart</span>
+                        Reorder Now
+                    </button>
+</div>
+<!-- Alert 3: Low Stock -->
+<div class="min-w-[280px] max-w-[320px] sm:min-w-[320px] flex-shrink-0 snap-center bg-[#fef3c7] border border-[#f59e0b]/20 rounded-xl p-4 flex flex-col justify-between shadow-sm">
+<div class="flex items-start gap-3 mb-4">
+<div class="p-2 bg-[#d97706] text-white rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-xl">inventory_2</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-[#92400e] text-sm leading-tight">Denso Spark Plugs</h3>
+<p class="text-[#b45309] font-semibold text-xs mt-1">1 set left (Min required: 6)</p>
+</div>
+</div>
+<button class="w-full h-12 bg-transparent border-2 border-[#d97706] text-[#d97706] hover:bg-[#fef3c7] font-bold rounded-lg transition-colors active:scale-[0.98] flex items-center justify-center gap-2">
+                        Dismiss
+                    </button>
+</div>
+</div>
+</section>
+<!-- Brand Filter Pills -->
+<section class="mb-6 border-b border-surface-variant pb-4">
+<div class="flex overflow-x-auto no-scrollbar gap-2 pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+<button class="flex-shrink-0 px-5 py-2.5 bg-primary text-on-primary rounded-full font-label font-bold text-sm shadow-sm transition-transform active:scale-95">All Brands (148)</button>
+<button class="flex-shrink-0 px-5 py-2.5 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-full font-label font-medium text-sm border border-outline-variant transition-transform active:scale-95">Castrol (18)</button>
+<button class="flex-shrink-0 px-5 py-2.5 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-full font-label font-medium text-sm border border-outline-variant transition-transform active:scale-95">Mobil (14)</button>
+<button class="flex-shrink-0 px-5 py-2.5 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-full font-label font-medium text-sm border border-outline-variant transition-transform active:scale-95">Bosch (32)</button>
+<button class="flex-shrink-0 px-5 py-2.5 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-full font-label font-medium text-sm border border-outline-variant transition-transform active:scale-95">Denso (24)</button>
+<button class="flex-shrink-0 px-5 py-2.5 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-full font-label font-medium text-sm border border-outline-variant transition-transform active:scale-95">Toyota OEM (28)</button>
+<button class="flex-shrink-0 px-5 py-2.5 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-full font-label font-medium text-sm border border-outline-variant transition-transform active:scale-95">NGK (12)</button>
+</div>
+</section>
+<!-- Inventory List (Cards) -->
+<section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Card 1 -->
+<article class="bg-surface-container-lowest border-2 border-surface-container-high rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+<div class="p-5 flex-grow">
+<div class="flex justify-between items-start mb-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#dcfce7] text-[#166534] font-label font-bold text-xs border border-[#bbf7d0]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                            14 Qts IN STOCK
+                        </span>
+<span class="text-xs font-mono text-on-surface-variant bg-surface-container px-2 py-1 rounded">CAS-5W40-01</span>
+</div>
+<h3 class="text-lg font-headline font-bold text-on-surface leading-tight mb-4">Castrol Edge 5W-40 Synthetic (1 Liter)</h3>
+<div class="flex items-center gap-4 text-sm font-medium">
+<div class="flex flex-col">
+<span class="text-on-surface-variant text-xs uppercase tracking-wider">Buy</span>
+<span class="text-on-surface">$8.50</span>
+</div>
+<div class="w-px h-8 bg-outline-variant"></div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant text-xs uppercase tracking-wider">Sell</span>
+<span class="text-primary font-bold">$14.00</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-px bg-surface-variant p-px">
+<button class="bg-surface-container-lowest hover:bg-surface-container h-[60px] flex items-center justify-center gap-2 font-bold text-on-surface transition-colors active:bg-surface-container-high">
+<span class="material-symbols-outlined">remove</span>
+                        Dispense
+                    </button>
+<button class="bg-primary/10 hover:bg-primary/20 h-[60px] flex items-center justify-center gap-2 font-bold text-primary transition-colors active:bg-primary/30">
+<span class="material-symbols-outlined">add</span>
+                        Add Stock
+                    </button>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-surface-container-lowest border-2 border-error-container rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col relative">
+<div class="absolute inset-0 bg-error/5 pointer-events-none"></div>
+<div class="p-5 flex-grow relative z-10">
+<div class="flex justify-between items-start mb-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-error-container text-on-error-container font-label font-bold text-xs border border-error/30">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                            0 Sets OUT OF STOCK
+                        </span>
+<span class="text-xs font-mono text-on-surface-variant bg-surface-container px-2 py-1 rounded">BOS-BP-442</span>
+</div>
+<h3 class="text-lg font-headline font-bold text-on-surface leading-tight mb-4">Bosch Ceramic Brake Pads</h3>
+<div class="flex items-center gap-4 text-sm font-medium">
+<div class="flex flex-col">
+<span class="text-on-surface-variant text-xs uppercase tracking-wider">Buy</span>
+<span class="text-on-surface">$28.00</span>
+</div>
+<div class="w-px h-8 bg-outline-variant"></div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant text-xs uppercase tracking-wider">Sell</span>
+<span class="text-primary font-bold">$45.00</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-px bg-surface-variant p-px relative z-10">
+<button class="bg-surface-container-lowest h-[60px] flex items-center justify-center gap-2 font-bold text-outline opacity-50 cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined">remove</span>
+                        Dispense
+                    </button>
+<button class="bg-primary hover:bg-primary/90 h-[60px] flex items-center justify-center gap-2 font-bold text-on-primary transition-colors active:scale-[0.98]">
+<span class="material-symbols-outlined">add</span>
+                        Add Stock
+                    </button>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-surface-container-lowest border-2 border-[#fef3c7] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col relative">
+<div class="absolute inset-0 bg-[#f59e0b]/5 pointer-events-none"></div>
+<div class="p-5 flex-grow relative z-10">
+<div class="flex justify-between items-start mb-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#fef3c7] text-[#92400e] font-label font-bold text-xs border border-[#fde68a]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#d97706]"></span>
+                            2 Gal LOW STOCK
+                        </span>
+<span class="text-xs font-mono text-on-surface-variant bg-surface-container px-2 py-1 rounded">DEN-CL-101</span>
+</div>
+<h3 class="text-lg font-headline font-bold text-on-surface leading-tight mb-4">Denso Radiator Coolant Pre-mix</h3>
+<div class="flex items-center gap-4 text-sm font-medium">
+<div class="flex flex-col">
+<span class="text-on-surface-variant text-xs uppercase tracking-wider">Buy</span>
+<span class="text-on-surface">$12.00</span>
+</div>
+<div class="w-px h-8 bg-outline-variant"></div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant text-xs uppercase tracking-wider">Sell</span>
+<span class="text-primary font-bold">$22.00</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-px bg-surface-variant p-px relative z-10">
+<button class="bg-surface-container-lowest hover:bg-surface-container h-[60px] flex items-center justify-center gap-2 font-bold text-on-surface transition-colors active:bg-surface-container-high">
+<span class="material-symbols-outlined">remove</span>
+                        Dispense
+                    </button>
+<button class="bg-primary/10 hover:bg-primary/20 h-[60px] flex items-center justify-center gap-2 font-bold text-primary transition-colors active:bg-primary/30">
+<span class="material-symbols-outlined">add</span>
+                        Add Stock
+                    </button>
+</div>
+</article>
+<!-- Card 4 -->
+<article class="bg-surface-container-lowest border-2 border-surface-container-high rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+<div class="p-5 flex-grow">
+<div class="flex justify-between items-start mb-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#dcfce7] text-[#166534] font-label font-bold text-xs border border-[#bbf7d0]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                            22 Qts IN STOCK
+                        </span>
+<span class="text-xs font-mono text-on-surface-variant bg-surface-container px-2 py-1 rounded">MOB-0W20-PRO</span>
+</div>
+<h3 class="text-lg font-headline font-bold text-on-surface leading-tight mb-4">Mobil 1 Advanced Full Synthetic 0W-20</h3>
+<div class="flex items-center gap-4 text-sm font-medium">
+<div class="flex flex-col">
+<span class="text-on-surface-variant text-xs uppercase tracking-wider">Buy</span>
+<span class="text-on-surface">$9.00</span>
+</div>
+<div class="w-px h-8 bg-outline-variant"></div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant text-xs uppercase tracking-wider">Sell</span>
+<span class="text-primary font-bold">$16.00</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-px bg-surface-variant p-px">
+<button class="bg-surface-container-lowest hover:bg-surface-container h-[60px] flex items-center justify-center gap-2 font-bold text-on-surface transition-colors active:bg-surface-container-high" onclick="showSnackbar()">
+<span class="material-symbols-outlined">remove</span>
+                        Dispense
+                    </button>
+<button class="bg-primary/10 hover:bg-primary/20 h-[60px] flex items-center justify-center gap-2 font-bold text-primary transition-colors active:bg-primary/30">
+<span class="material-symbols-outlined">add</span>
+                        Add Stock
+                    </button>
+</div>
+</article>
+</section>
+</main>
+<!-- FAB: + New Part -->
+<button class="fixed bottom-24 right-4 md:right-8 bg-primary hover:bg-primary/90 text-on-primary w-16 h-16 rounded-2xl shadow-lg flex items-center justify-center transition-transform active:scale-90 z-40 lg:hidden">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 bg-surface-container dark:bg-surface-container-low shadow-[0_-1px_3px_0_rgba(0,0,0,0.1)] rounded-t-lg">
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed active:scale-90 transition-transform w-16">
+<span class="material-symbols-outlined text-2xl mb-1">menu_book</span>
+<span class="font-label text-xs font-medium">Ledger</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed active:scale-90 transition-transform w-16">
+<span class="material-symbols-outlined text-2xl mb-1">group</span>
+<span class="font-label text-xs font-medium">Customers</span>
+</button>
+<!-- Active Tab: Stock -->
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1.5 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-2xl mb-0.5" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-label text-xs font-bold">Stock</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed active:scale-90 transition-transform w-16">
+<span class="material-symbols-outlined text-2xl mb-1">payments</span>
+<span class="font-label text-xs font-medium">Expenses</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed active:scale-90 transition-transform w-16">
+<span class="material-symbols-outlined text-2xl mb-1">dashboard</span>
+<span class="font-label text-xs font-medium">Dashboard</span>
+</button>
+</nav>
+<!-- Snackbar (Hidden by default, shown via JS for demo) -->
+<div class="fixed bottom-24 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md bg-inverse-surface text-inverse-on-surface px-4 py-3 rounded-xl shadow-lg flex items-center justify-between z-50 transform translate-y-20 opacity-0 transition-all duration-300" id="demoSnackbar">
+<span class="text-sm font-medium">Dispensed 1x Denso Coolant for Bay 2</span>
+<button class="text-inverse-primary font-bold text-sm tracking-wide active:scale-95 transition-transform" onclick="hideSnackbar()">UNDO (5s)</button>
+</div>
+<script>
+        // Simple Header Shadow on Scroll
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('mainHeader');
+            if (window.scrollY > 10) {
+                header.classList.add('shadow-md');
+                header.classList.remove('border-b');
+            } else {
+                header.classList.remove('shadow-md');
+                header.classList.add('border-b');
+            }
+        });
+
+        // Demo Snackbar Logic
+        let snackbarTimeout;
+        function showSnackbar() {
+            const snackbar = document.getElementById('demoSnackbar');
+            snackbar.classList.remove('translate-y-20', 'opacity-0');
+            
+            clearTimeout(snackbarTimeout);
+            snackbarTimeout = setTimeout(() => {
+                hideSnackbar();
+            }, 5000);
+        }
+
+        function hideSnackbar() {
+            const snackbar = document.getElementById('demoSnackbar');
+            snackbar.classList.add('translate-y-20', 'opacity-0');
+        }
+    </script>
+</body></html>
