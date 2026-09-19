@@ -125,10 +125,47 @@ void main() {
       await tester.tap(find.text('4'));
       await tester.pump();
 
+      await tester.ensureVisible(find.text('Unlock Garage'));
       await tester.tap(find.text('Unlock Garage'));
       await tester.pumpAndSettle();
 
       expect(repo.isAppLocked, isFalse);
+    });
+
+    testWidgets('Forgot PIN button displays modal for Owner and informative alert for Staff', (tester) async {
+      await repo.loginOwner('1234');
+      repo.lockApp();
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<GarageRepository>.value(value: repo),
+            ChangeNotifierProvider<CurrencyManager>(create: (_) => CurrencyManager()),
+            ChangeNotifierProvider<AppLocaleManager>(create: (_) => AppLocaleManager()),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.lightTheme(),
+            home: const LoginScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify Forgot PIN button exists
+      final forgotPinFinder = find.text('Forgot PIN?');
+      expect(forgotPinFinder, findsOneWidget);
+
+      // Tap Forgot PIN when Owner is locked -> opens Owner Recovery Modal
+      await tester.ensureVisible(forgotPinFinder);
+      await tester.tap(forgotPinFinder);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Owner PIN Recovery'), findsOneWidget);
+      expect(find.text('Verify & Set New PIN'), findsOneWidget);
+
+      // Close modal
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pumpAndSettle();
     });
   });
 }

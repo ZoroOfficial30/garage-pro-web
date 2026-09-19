@@ -18,6 +18,125 @@ class StaffLoginManagementModal {
       builder: (ctx) => const _StaffLoginManagementSheet(),
     );
   }
+
+  static void showResetPinDialog(BuildContext context, Employee emp) {
+    final repo = Provider.of<GarageRepository>(context, listen: false);
+    final locale = Provider.of<AppLocaleManager>(context, listen: false);
+    final pinController = TextEditingController(text: emp.pin == '0000' ? '' : emp.pin);
+    String? errorText;
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLight,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.key_rounded, color: AppColors.primary, size: 22),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      locale.isBangla ? 'স্টাফ পিন রিসেট করুন' : 'Reset Staff PIN',
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+                    ),
+                    Text(
+                      emp.name,
+                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                locale.isBangla
+                    ? '৪ থেকে ৬ ডিজিটের একটি সহজ পিন কোড লিখুন যা ব্যবহার করে ${emp.name} অ্যাপে প্রবেশ করতে পারবে।'
+                    : 'Enter a 4–6 digit numeric PIN code that ${emp.name} will use to log in.',
+                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: pinController,
+                keyboardType: TextInputType.number,
+                maxLength: 6,
+                autofocus: true,
+                decoration: InputDecoration(
+                  labelText: locale.isBangla ? 'নতুন পিন কোড (৪-৬ ডিজিট)' : 'New Login PIN (4–6 digits)',
+                  hintText: 'e.g. 4321',
+                  prefixIcon: const Icon(Icons.lock_outline_rounded),
+                  errorText: errorText,
+                ),
+                onChanged: (val) {
+                  if (errorText != null) {
+                    setDialogState(() => errorText = null);
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: Text(
+                locale.isBangla ? 'বাতিল' : 'Cancel',
+                style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              onPressed: () async {
+                final pin = pinController.text.trim();
+                if (pin.length < 4 || pin.length > 6) {
+                  setDialogState(() {
+                    errorText = locale.isBangla
+                        ? 'পিন অবশ্যই ৪ থেকে ৬ ডিজিটের হতে হবে'
+                        : 'PIN must be between 4 and 6 digits';
+                  });
+                  return;
+                }
+                Navigator.pop(dialogCtx);
+                await repo.setEmployeePin(emp.id, pin);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(locale.isBangla
+                          ? '${emp.name}-এর পিন কোড সফলভাবে রিসেট হয়েছে'
+                          : 'PIN successfully reset for ${emp.name}'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                }
+              },
+              child: Text(
+                locale.isBangla ? 'রিসেট সংরক্ষণ করুন' : 'Save & Reset PIN',
+                style: const TextStyle(fontWeight: FontWeight.w800),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _StaffLoginManagementSheet extends StatefulWidget {

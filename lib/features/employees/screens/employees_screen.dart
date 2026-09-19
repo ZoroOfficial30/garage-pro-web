@@ -703,6 +703,34 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                                             ),
                                           ],
                                         ),
+                                        const SizedBox(height: 8),
+                                        InkWell(
+                                          onTap: () => StaffLoginManagementModal.showResetPinDialog(context, emp),
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.primaryLight,
+                                              borderRadius: BorderRadius.circular(8),
+                                              border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(Icons.password_rounded, size: 14, color: AppColors.primary),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  locale.isBangla ? 'স্টাফ পিন রিসেট করুন' : 'Reset Staff PIN',
+                                                  style: const TextStyle(
+                                                    fontSize: 11.5,
+                                                    fontWeight: FontWeight.w800,
+                                                    color: AppColors.primary,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
                                       ],
                                     ],
                                   ),
@@ -715,7 +743,9 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                               icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               onSelected: (val) {
-                                if (val == 'attendance') {
+                                if (val == 'reset_pin') {
+                                  StaffLoginManagementModal.showResetPinDialog(context, emp);
+                                } else if (val == 'attendance') {
                                   MonthlyAttendanceModal.show(context, emp);
                                 } else if (val == 'login_pin') {
                                   StaffLoginManagementModal.show(context);
@@ -726,7 +756,17 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                                 }
                               },
                               itemBuilder: (ctx) => [
-                                if (repo.isOwner)
+                                if (repo.isOwner) ...[
+                                  const PopupMenuItem(
+                                    value: 'reset_pin',
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.password_rounded, color: AppColors.primary, size: 18),
+                                        SizedBox(width: 8),
+                                        Text('Reset Staff PIN'),
+                                      ],
+                                    ),
+                                  ),
                                   const PopupMenuItem(
                                     value: 'login_pin',
                                     child: Row(
@@ -737,6 +777,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                                       ],
                                     ),
                                   ),
+                                ],
                                 const PopupMenuItem(
                                   value: 'attendance',
                                   child: Row(

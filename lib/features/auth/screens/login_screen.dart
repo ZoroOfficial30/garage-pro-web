@@ -8,6 +8,7 @@ import '../../../core/services/biometric_auth_service.dart';
 import '../../../data/models/employee.dart';
 import '../../../data/repositories/garage_repository.dart';
 import '../../settings/widgets/cloud_account_modal.dart';
+import '../widgets/forgot_pin_recovery_modal.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -132,6 +133,49 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _handleForgotPin(BuildContext context, GarageRepository repo, AppLocaleManager locale) {
+    final isStaffMode = !_isOwnerMode || (repo.isAppLocked && repo.currentUser?.isStaff == true);
+    if (isStaffMode) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              const Icon(Icons.info_outline_rounded, color: AppColors.primary, size: 24),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  locale.isBangla ? 'স্টাফ পিন রিসেট' : 'Staff PIN Reset',
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            locale.isBangla
+                ? 'আপনার অ্যাক্সেস পিন রিসেট করতে অনুগ্রহ করে গ্যারেজ মালিকের সাথে যোগাযোগ করুন।'
+                : 'Please contact the Garage Owner to reset your access PIN.',
+            style: const TextStyle(fontSize: 14, height: 1.4),
+          ),
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(locale.isBangla ? 'ঠিক আছে' : 'OK'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      ForgotPinRecoveryModal.show(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final repo = Provider.of<GarageRepository>(context);
@@ -210,7 +254,29 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // 5. Numeric Keypad (Glove-Friendly Touch Targets)
                   _buildKeypad(),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 6),
+
+                  // Subtle "Forgot PIN?" text button
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.textSecondary,
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      onPressed: () => _handleForgotPin(context, repo, locale),
+                      child: Text(
+                        locale.isBangla ? 'পিন ভুলে গেছেন?' : 'Forgot PIN?',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
 
                   // 6. Login Action Button
                   SizedBox(
