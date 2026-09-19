@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/localization/app_locale.dart';
+import '../../../core/services/biometric_auth_service.dart';
 import '../../../data/models/employee.dart';
 import '../../../data/repositories/garage_repository.dart';
 import '../../settings/widgets/cloud_account_modal.dart';
@@ -20,6 +22,42 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _selectedStaffId;
   String? _errorMessage;
   bool _isLoading = false;
+  bool _canUseBiometrics = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometrics();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final repo = Provider.of<GarageRepository>(context, listen: false);
+      if (repo.isAppLocked && repo.currentUser != null) {
+        if (repo.currentUser!.isStaff) {
+          setState(() {
+            _isOwnerMode = false;
+            _selectedStaffId = repo.currentUser!.staffId ?? repo.currentUser!.id;
+          });
+        } else {
+          setState(() {
+            _isOwnerMode = true;
+          });
+        }
+      }
+    });
+  }
+
+  Future<void> _checkBiometrics() async {
+    if (kIsWeb) {
+      if (mounted) {
+        setState(() => _canUseBiometrics = false);
+      }
+      return;
+    }
+    final available = await BiometricAuthService().isBiometricAvailable();
+    if (mounted) {
+      setState(() => _canUseBiometrics = available);
+    }
+  }
 
   void _onKeypadTap(String value) {
     if (_enteredPin.length < 6) {
@@ -62,7 +100,9 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     bool success = false;
-    if (_isOwnerMode) {
+    if (repo.isAppLocked) {
+      success = await repo.unlockWithPin(_enteredPin);
+    } else if (_isOwnerMode) {
       success = await repo.loginOwner(_enteredPin);
     } else {
       if (_selectedStaffId == null) {
@@ -193,17 +233,74 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
                             )
                           : Text(
-                              _isOwnerMode
-                                  ? (locale.isBangla ? 'মালিক হিসেবে প্রবেশ করুন' : 'Login as Owner')
-                                  : (locale.isBangla ? 'স্টাফ হিসেবে প্রবেশ করুন' : 'Login as Staff'),
+                              repo.isAppLocked
+                                  ? (locale.isBangla ? 'আনলক করুন' : 'Unlock Garage')
+                                  : (_isOwnerMode
+                                      ? (locale.isBangla ? 'মালিক হিসেবে প্রবেশ করুন' : 'Login as Owner')
+                                      : (locale.isBangla ? 'স্টাফ হিসেবে প্রবেশ করুন' : 'Login as Staff')),
                               style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15),
                             ),
                     ),
                   ),
+
+                  // 7. Biometrics Button (Mobile only, graceful Web fallback)
+                  if (!kIsWeb && _canUseBiometrics && repo.biometricEnabled) ...[
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: const BorderSide(color: AppColors.primary, width: 1.5),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        icon: const Icon(Icons.fingerprint_rounded, size: 22),
+                        label: Text(
+                          locale.isBangla ? 'বায়োমেট্রিক দিয়ে আনলক করুন' : 'Unlock with Biometrics',
+                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                        ),
+                        onPressed: _isLoading ? null : () async {
+                          setState(() {
+                            _isLoading = true;
+                            _errorMessage = null;
+                          });
+                          final success = await repo.unlockWithBiometrics();
+                          if (!mounted) return;
+                          setState(() => _isLoading = false);
+                          if (!success) {
+                            setState(() {
+                              _errorMessage = locale.isBangla
+                                  ? 'বায়োমেট্রিক যাচাইকরণ ব্যর্থ হয়েছে বা বাতিল করা হয়েছে।'
+                                  : 'Biometric verification failed or was cancelled.';
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+
+                  if (repo.isAppLocked) ...[
+                    const SizedBox(height: 8),
+                    TextButton.icon(
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.textSecondary,
+                      ),
+                      icon: const Icon(Icons.logout_rounded, size: 16),
+                      label: Text(
+                        locale.isBangla ? 'লগআউট / ব্যবহারকারী পরিবর্তন' : 'Log Out / Switch User',
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                      ),
+                      onPressed: () async {
+                        await repo.logout();
+                        _onClear();
+                      },
+                    ),
+                  ],
                   const SizedBox(height: 14),
 
                   // Initial Hint for Owner PIN
-                  if (_isOwnerMode) ...[
+                  if (_isOwnerMode && !repo.isAppLocked) ...[
                     Text(
                       locale.isBangla
                           ? 'ডিফল্ট মালিক পিন: 1234 (সেটিংস থেকে পরিবর্তনযোগ্য)'
@@ -284,17 +381,31 @@ class _LoginScreenState extends State<LoginScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: repo.isAppLocked ? AppColors.warningLight : AppColors.surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: repo.isAppLocked ? AppColors.warning.withValues(alpha: 0.5) : AppColors.border),
           ),
-          child: Text(
-            locale.isBangla ? 'গ্যারেজ অ্যাকাউন্টিং প্রো • অফলাইন অ্যাক্সেস' : 'Garage Accounting Pro • Offline Access',
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textSecondary,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (repo.isAppLocked) ...[
+                const Icon(Icons.lock_clock_rounded, size: 12, color: AppColors.warning),
+                const SizedBox(width: 4),
+              ],
+              Flexible(
+                child: Text(
+                  repo.isAppLocked
+                      ? (locale.isBangla ? 'অটো-লক • পিন দিয়ে খুলুন' : 'Auto-Locked • Enter PIN')
+                      : (locale.isBangla ? 'গ্যারেজ অ্যাকাউন্টিং প্রো • অফলাইন অ্যাক্সেস' : 'Garage Accounting Pro • Offline Access'),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: repo.isAppLocked ? AppColors.warning : AppColors.textSecondary,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
         ),
       ],

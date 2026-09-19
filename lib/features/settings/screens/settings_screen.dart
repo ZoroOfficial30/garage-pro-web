@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -759,13 +760,17 @@ class SettingsScreen extends StatelessWidget {
               locale.translate('biometric_lock'),
               style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
             ),
-            subtitle: const Text(
-              'Unlock with fingerprint sensor before viewing dues',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            subtitle: Text(
+              kIsWeb
+                  ? (locale.isBangla
+                      ? 'ওয়েব ব্রাউজারে বায়োমেট্রিক উপলব্ধ নেই (মোবাইলে ফিঙ্গারপ্রিন্ট সমর্থিত)'
+                      : 'Biometrics unavailable on Web (Supported on mobile devices)')
+                  : 'Unlock with fingerprint sensor or Face ID',
+              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
-            value: repo.biometricEnabled,
+            value: kIsWeb ? false : repo.biometricEnabled,
             activeThumbColor: AppColors.primary,
-            onChanged: (val) => repo.setBiometricEnabled(val),
+            onChanged: kIsWeb ? null : (val) => repo.setBiometricEnabled(val),
           ),
         ],
       ),

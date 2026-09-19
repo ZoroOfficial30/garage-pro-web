@@ -14,6 +14,7 @@ import '../models/supplier_due.dart';
 import '../models/app_user.dart';
 import '../services/backup_service.dart';
 import '../../core/services/sync_service.dart';
+import '../../core/services/biometric_auth_service.dart';
 
 class DailyIncomeBreakdown {
   final double carWashIncome;
@@ -190,6 +191,22 @@ class GarageRepository extends ChangeNotifier {
   bool get isStaff => _currentUser?.isStaff ?? false;
   String get ownerPin => _getSetting('pin_code', '1234') as String;
   bool get isGarageSetupCompleted => _getSetting('garage_setup_completed', true) as bool;
+  bool _isAppLocked = false;
+  bool get isAppLocked => _isAppLocked;
+
+  void lockApp() {
+    if (_currentUser != null && !_isAppLocked) {
+      _isAppLocked = true;
+      notifyListeners();
+    }
+  }
+
+  void unlockApp() {
+    if (_isAppLocked) {
+      _isAppLocked = false;
+      notifyListeners();
+    }
+  }
 
   Future<void> setGarageSetupCompleted(bool completed) async {
     await _putSetting('garage_setup_completed', completed);
@@ -2544,6 +2561,7 @@ class GarageRepository extends ChangeNotifier {
           ? workshopProfile['name']!
           : 'Workshop Owner',
     );
+    _isAppLocked = false;
     try {
       await _db.settingsBox.put('active_user_session', _currentUser!.toMap());
     } catch (_) {}
@@ -2572,6 +2590,7 @@ class GarageRepository extends ChangeNotifier {
       avatarBase64: staffMember.avatarBase64,
       designation: staffMember.role,
     );
+    _isAppLocked = false;
     try {
       await _db.settingsBox.put('active_user_session', _currentUser!.toMap());
     } catch (_) {}
@@ -2579,8 +2598,32 @@ class GarageRepository extends ChangeNotifier {
     return true;
   }
 
+  Future<bool> unlockWithPin(String pin) async {
+    final cleanPin = pin.trim();
+    if (_currentUser == null || _currentUser!.isOwner) {
+      return await loginOwner(cleanPin);
+    } else {
+      final staffId = _currentUser!.staffId ?? _currentUser!.id;
+      return await loginStaff(staffId, cleanPin);
+    }
+  }
+
+  Future<bool> unlockWithBiometrics() async {
+    final ok = await BiometricAuthService().authenticate();
+    if (ok) {
+      if (_currentUser == null) {
+        return await loginOwner(ownerPin);
+      }
+      _isAppLocked = false;
+      notifyListeners();
+      return true;
+    }
+    return false;
+  }
+
   Future<void> logout() async {
     _currentUser = null;
+    _isAppLocked = false;
     try {
       await _db.settingsBox.delete('active_user_session');
     } catch (_) {}

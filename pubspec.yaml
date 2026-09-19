@@ -48,6 +48,7 @@ dependencies:
   connectivity_plus: ^6.1.0
   shared_preferences: ^2.3.5
   shared_preferences_web: ^2.4.2
+  local_auth: ^3.0.2
 
 dev_dependencies:
   flutter_test:
