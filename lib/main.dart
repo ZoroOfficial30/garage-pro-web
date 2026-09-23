@@ -71,16 +71,17 @@ void main() async {
 }
 
 class GarageAccountingApp extends StatefulWidget {
-  const GarageAccountingApp({super.key});
+  final DateTime Function()? clock;
+  const GarageAccountingApp({super.key, this.clock});
 
   @override
   State<GarageAccountingApp> createState() => _GarageAccountingAppState();
 }
 
 class _GarageAccountingAppState extends State<GarageAccountingApp> with WidgetsBindingObserver {
-  Timer? _inactivityTimer;
-  Timer? _backgroundTimer;
-  DateTime? _backgroundedAt;
+  DateTime? _backgroundTimestamp;
+
+  DateTime _now() => widget.clock != null ? widget.clock!() : DateTime.now();
 
   @override
   void initState() {
@@ -91,85 +92,27 @@ class _GarageAccountingAppState extends State<GarageAccountingApp> with WidgetsB
 
   @override
   void dispose() {
-    _inactivityTimer?.cancel();
-    _backgroundTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+      _backgroundTimestamp ??= _now();
+    } else if (state == AppLifecycleState.resumed) {
       _triggerAutoSync();
-      _handleForegroundResume();
-    } else if (state == AppLifecycleState.paused ||
-               state == AppLifecycleState.hidden ||
-               state == AppLifecycleState.inactive) {
-      _handleBackgroundPause();
-    }
-  }
-
-  void _handleBackgroundPause() {
-    _backgroundedAt = DateTime.now();
-    _inactivityTimer?.cancel();
-
-    // Do not run background lock timer in automated widget test environment to prevent pending timer leaks
-    if (WidgetsBinding.instance.runtimeType.toString().contains('TestWidgetsFlutterBinding')) {
-      return;
-    }
-
-    final repo = Provider.of<GarageRepository>(context, listen: false);
-    if (!repo.isAuthenticated || repo.isAppLocked || !repo.pinLockEnabled) {
-      return;
-    }
-
-    _backgroundTimer?.cancel();
-    _backgroundTimer = Timer(const Duration(seconds: 10), () {
-      if (mounted) {
-        final currentRepo = Provider.of<GarageRepository>(context, listen: false);
-        if (currentRepo.isAuthenticated && !currentRepo.isAppLocked && currentRepo.pinLockEnabled) {
-          currentRepo.lockApp();
+      if (_backgroundTimestamp != null) {
+        final elapsed = _now().difference(_backgroundTimestamp!).inSeconds;
+        _backgroundTimestamp = null;
+        if (elapsed >= 10) {
+          final repo = Provider.of<GarageRepository>(context, listen: false);
+          if (repo.isAuthenticated && !repo.isAppLocked && repo.pinLockEnabled) {
+            repo.lockApp();
+          }
         }
       }
-    });
-  }
-
-  void _handleForegroundResume() {
-    _backgroundTimer?.cancel();
-    if (_backgroundedAt != null) {
-      final elapsed = DateTime.now().difference(_backgroundedAt!);
-      if (elapsed >= const Duration(seconds: 10)) {
-        final repo = Provider.of<GarageRepository>(context, listen: false);
-        if (repo.isAuthenticated && !repo.isAppLocked && repo.pinLockEnabled) {
-          repo.lockApp();
-        }
-      }
-      _backgroundedAt = null;
     }
-    _resetInactivityTimer();
-  }
-
-  void _resetInactivityTimer() {
-    _inactivityTimer?.cancel();
-
-    // Do not start unawaited timer in automated test environment unless explicitly driven
-    if (WidgetsBinding.instance.runtimeType.toString().contains('TestWidgetsFlutterBinding')) {
-      return;
-    }
-
-    final repo = Provider.of<GarageRepository>(context, listen: false);
-    if (!repo.isAuthenticated || repo.isAppLocked || !repo.pinLockEnabled) {
-      return;
-    }
-
-    _inactivityTimer = Timer(const Duration(seconds: 10), () {
-      if (mounted) {
-        final currentRepo = Provider.of<GarageRepository>(context, listen: false);
-        if (currentRepo.isAuthenticated && !currentRepo.isAppLocked && currentRepo.pinLockEnabled) {
-          currentRepo.lockApp();
-        }
-      }
-    });
   }
 
   void _triggerAutoSync() {
@@ -184,25 +127,15 @@ class _GarageAccountingAppState extends State<GarageAccountingApp> with WidgetsB
     final locale = Provider.of<AppLocaleManager>(context);
     final repo = Provider.of<GarageRepository>(context);
 
-    // If user is authenticated, unlocked, and inactivity timer isn't running, start it
-    if (repo.isAuthenticated && !repo.isAppLocked && repo.pinLockEnabled && _inactivityTimer == null) {
-      _resetInactivityTimer();
-    }
-
     return MaterialApp(
       title: 'Garage Accounting Pro',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme(),
       locale: locale.locale,
       builder: (context, child) {
-        return Listener(
-          behavior: HitTestBehavior.translucent,
-          onPointerDown: (_) => _resetInactivityTimer(),
-          onPointerMove: (_) => _resetInactivityTimer(),
-          child: Directionality(
-            textDirection: locale.textDirection,
-            child: child ?? const SizedBox.shrink(),
-          ),
+        return Directionality(
+          textDirection: locale.textDirection,
+          child: child ?? const SizedBox.shrink(),
         );
       },
       home: !repo.isGarageSetupCompleted

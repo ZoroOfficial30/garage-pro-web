@@ -8,6 +8,8 @@ import 'package:garage_accounting_pro/core/localization/app_locale.dart';
 import 'package:garage_accounting_pro/data/models/employee.dart';
 import 'package:garage_accounting_pro/data/repositories/garage_repository.dart';
 import 'package:garage_accounting_pro/features/auth/screens/login_screen.dart';
+import 'package:garage_accounting_pro/core/services/sync_service.dart';
+import 'package:garage_accounting_pro/main.dart';
 
 void main() {
   group('Auto-Lock & Biometric Fallback Tests', () {
@@ -166,6 +168,58 @@ void main() {
       // Close modal
       await tester.tap(find.byIcon(Icons.close_rounded));
       await tester.pumpAndSettle();
+    });
+
+    testWidgets('Lifecycle background tracking: foreground stays unlocked, >= 10s background locks', (tester) async {
+      await repo.loginOwner('1234');
+      await repo.setGarageSetupCompleted(true);
+      expect(repo.isAuthenticated, isTrue);
+      expect(repo.isAppLocked, isFalse);
+
+      var fakeTime = DateTime(2026, 1, 1, 12, 0, 0);
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<GarageRepository>.value(value: repo),
+            ChangeNotifierProvider<CurrencyManager>(create: (_) => CurrencyManager()),
+            ChangeNotifierProvider<AppLocaleManager>(create: (_) => AppLocaleManager()),
+            ChangeNotifierProvider<SyncService>.value(value: SyncService()),
+          ],
+          child: GarageAccountingApp(clock: () => fakeTime),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // 1. Foreground idle time: advance time by 60 seconds without backgrounding
+      fakeTime = fakeTime.add(const Duration(seconds: 60));
+      await tester.pump();
+      expect(repo.isAppLocked, isFalse, reason: 'App must NEVER lock while remaining in foreground');
+
+      // 2. Brief background: background app, advance time by 5 seconds, resume
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      await tester.pump();
+      fakeTime = fakeTime.add(const Duration(seconds: 5));
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pump();
+      expect(repo.isAppLocked, isFalse, reason: 'App must not lock if backgrounded for less than 10 seconds');
+
+      // 3. Extended background: background app, advance time by 12 seconds, resume
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      await tester.pump();
+      fakeTime = fakeTime.add(const Duration(seconds: 12));
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pump();
+      expect(repo.isAppLocked, isTrue, reason: 'App must lock when resumed after >= 10 seconds in background');
     });
   });
 }
