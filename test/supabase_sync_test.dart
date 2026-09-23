@@ -9,6 +9,8 @@ import 'package:garage_accounting_pro/core/services/sync_service.dart';
 import 'package:garage_accounting_pro/data/models/customer.dart';
 import 'package:garage_accounting_pro/data/models/bay_job.dart';
 import 'package:garage_accounting_pro/data/models/transaction_record.dart';
+import 'package:garage_accounting_pro/data/models/stock_item.dart';
+import 'package:garage_accounting_pro/data/models/employee.dart';
 import 'package:garage_accounting_pro/data/repositories/garage_repository.dart';
 import 'package:garage_accounting_pro/features/settings/screens/settings_screen.dart';
 import 'package:garage_accounting_pro/features/settings/widgets/cloud_account_modal.dart';
@@ -133,6 +135,83 @@ void main() {
       expect(fromRemote.id, 'tx-801');
       expect(fromRemote.amount, 100.0);
       expect(fromRemote.type, 'payment');
+    });
+
+    test('StockItem model serialization and deserialization (camelCase & snake_case)', () {
+      final now = DateTime(2026, 9, 22, 10, 0);
+      final item = StockItem(
+        id: 'stock-001',
+        name: 'Oil Filter 90915-YZZE1',
+        brand: 'Toyota Genuine',
+        sku: 'TF-90915',
+        quantity: 25,
+        reorderThreshold: 5,
+        costPrice: 4.50,
+        sellingPrice: 8.00,
+        unit: 'Pcs',
+        createdAt: now,
+        updatedAt: now,
+        isSynced: false,
+      );
+
+      final localMap = item.toMap();
+      expect(localMap['id'], 'stock-001');
+      expect(localMap['reorderThreshold'], 5);
+      expect(localMap['costPrice'], 4.50);
+      expect(localMap['isSynced'], false);
+
+      final remoteMap = item.toSupabaseMap('user-uuid-999');
+      expect(remoteMap['id'], 'stock-001');
+      expect(remoteMap['reorder_threshold'], 5);
+      expect(remoteMap['cost_price'], 4.50);
+      expect(remoteMap['selling_price'], 8.00);
+      expect(remoteMap['user_id'], 'user-uuid-999');
+
+      final restored = StockItem.fromMap(remoteMap);
+      expect(restored.id, 'stock-001');
+      expect(restored.name, 'Oil Filter 90915-YZZE1');
+      expect(restored.reorderThreshold, 5);
+      expect(restored.costPrice, 4.50);
+      expect(restored.sellingPrice, 8.00);
+    });
+
+    test('Employee model serialization and deserialization (camelCase & snake_case)', () {
+      final now = DateTime(2026, 9, 22, 10, 0);
+      final emp = Employee(
+        id: 'emp-001',
+        name: 'Karim Ahmed',
+        role: 'Senior Mechanic',
+        pin: '1234',
+        isLoginEnabled: true,
+        phone: '+8801700000000',
+        avatarBase64: null,
+        monthlySalary: 350.0,
+        isSalaryPaid: false,
+        lastSalaryPaidDate: null,
+        isPresent: true,
+        lastAttendanceDate: now,
+        createdAt: now,
+        updatedAt: now,
+        isSynced: false,
+      );
+
+      final localMap = emp.toMap();
+      expect(localMap['id'], 'emp-001');
+      expect(localMap['monthlySalary'], 350.0);
+      expect(localMap['isLoginEnabled'], true);
+
+      final remoteMap = emp.toSupabaseMap('user-uuid-999');
+      expect(remoteMap['id'], 'emp-001');
+      expect(remoteMap['monthly_salary'], 350.0);
+      expect(remoteMap['is_login_enabled'], true);
+      expect(remoteMap['user_id'], 'user-uuid-999');
+
+      final restored = Employee.fromMap(remoteMap);
+      expect(restored.id, 'emp-001');
+      expect(restored.name, 'Karim Ahmed');
+      expect(restored.role, 'Senior Mechanic');
+      expect(restored.monthlySalary, 350.0);
+      expect(restored.isLoginEnabled, true);
     });
   });
 

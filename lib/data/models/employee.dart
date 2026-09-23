@@ -87,27 +87,51 @@ class Employee {
     };
   }
 
+  Map<String, dynamic> toSupabaseMap(String userId) {
+    return {
+      'id': id,
+      'name': name,
+      'role': role,
+      'pin': pin,
+      'is_login_enabled': isLoginEnabled,
+      'phone': phone,
+      'avatar_base64': avatarBase64,
+      'monthly_salary': monthlySalary,
+      'is_salary_paid': isSalaryPaid,
+      'last_salary_paid_date': lastSalaryPaidDate?.toIso8601String(),
+      'is_present': isPresent,
+      'last_attendance_date': lastAttendanceDate?.toIso8601String(),
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'user_id': userId,
+    };
+  }
+
   factory Employee.fromMap(Map<dynamic, dynamic> map) {
     return Employee(
-      id: map['id'] as String,
-      name: map['name'] as String,
-      role: map['role'] as String,
-      pin: (map['pin'] as String?) ?? '0000',
-      isLoginEnabled: map['isLoginEnabled'] as bool? ?? true,
-      phone: map['phone'] as String,
-      avatarBase64: map['avatarBase64'] as String?,
-      monthlySalary: (map['monthlySalary'] as num?)?.toDouble() ?? 250.0,
-      isSalaryPaid: map['isSalaryPaid'] as bool? ?? false,
-      lastSalaryPaidDate: map['lastSalaryPaidDate'] != null
-          ? DateTime.tryParse(map['lastSalaryPaidDate'] as String)
+      id: (map['id'] ?? '') as String,
+      name: (map['name'] ?? '') as String,
+      role: (map['role'] ?? '') as String,
+      pin: ((map['pin']) as String?) ?? '0000',
+      isLoginEnabled: (map['isLoginEnabled'] ?? map['is_login_enabled']) as bool? ?? true,
+      phone: (map['phone'] ?? '') as String,
+      avatarBase64: (map['avatarBase64'] ?? map['avatar_base64']) as String?,
+      monthlySalary: ((map['monthlySalary'] ?? map['monthly_salary']) as num?)?.toDouble() ?? 250.0,
+      isSalaryPaid: (map['isSalaryPaid'] ?? map['is_salary_paid']) as bool? ?? false,
+      lastSalaryPaidDate: (map['lastSalaryPaidDate'] ?? map['last_salary_paid_date']) != null
+          ? DateTime.tryParse((map['lastSalaryPaidDate'] ?? map['last_salary_paid_date']) as String)
           : null,
-      isPresent: map['isPresent'] as bool? ?? true,
-      lastAttendanceDate: map['lastAttendanceDate'] != null
-          ? DateTime.tryParse(map['lastAttendanceDate'] as String)
+      isPresent: (map['isPresent'] ?? map['is_present']) as bool? ?? true,
+      lastAttendanceDate: (map['lastAttendanceDate'] ?? map['last_attendance_date']) != null
+          ? DateTime.tryParse((map['lastAttendanceDate'] ?? map['last_attendance_date']) as String)
           : null,
-      createdAt: DateTime.parse(map['createdAt'] as String),
-      updatedAt: DateTime.parse(map['updatedAt'] as String),
-      isSynced: map['isSynced'] as bool? ?? false,
+      createdAt: map['createdAt'] != null
+          ? DateTime.parse(map['createdAt'] as String)
+          : (map['created_at'] != null ? DateTime.parse(map['created_at'] as String) : DateTime.now()),
+      updatedAt: map['updatedAt'] != null
+          ? DateTime.parse(map['updatedAt'] as String)
+          : (map['updated_at'] != null ? DateTime.parse(map['updated_at'] as String) : DateTime.now()),
+      isSynced: (map['isSynced'] ?? map['is_synced']) as bool? ?? false,
     );
   }
 }

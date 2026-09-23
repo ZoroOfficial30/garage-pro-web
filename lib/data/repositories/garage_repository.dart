@@ -497,6 +497,7 @@ class GarageRepository extends ChangeNotifier {
     try {
       await _db.stockItemsBox.put(item.id, item.toMap());
       await loadAllData();
+      _triggerAutoSync();
     } catch (_) {
       _stockItems.insert(0, item);
       notifyListeners();
@@ -506,11 +507,16 @@ class GarageRepository extends ChangeNotifier {
   Future<void> updateStockItem(StockItem item) async {
     await _db.stockItemsBox.put(item.id, item.toMap());
     await loadAllData();
+    _triggerAutoSync();
   }
 
   Future<void> deleteStockItem(String id) async {
     await _db.stockItemsBox.delete(id);
     await loadAllData();
+    _triggerAutoSync();
+    try {
+      unawaited(SyncService().deleteRemoteStockItem(id));
+    } catch (_) {}
   }
 
   void _triggerUndoWindow(UndoActionItem action) {
@@ -1810,16 +1816,22 @@ class GarageRepository extends ChangeNotifier {
   Future<void> createEmployee(Employee emp) async {
     await _db.employeesBox.put(emp.id, emp.toMap());
     await loadAllData();
+    _triggerAutoSync();
   }
 
   Future<void> updateEmployee(Employee emp) async {
     await _db.employeesBox.put(emp.id, emp.toMap());
     await loadAllData();
+    _triggerAutoSync();
   }
 
   Future<void> deleteEmployee(String id) async {
     await _db.employeesBox.delete(id);
     await loadAllData();
+    _triggerAutoSync();
+    try {
+      unawaited(SyncService().deleteRemoteEmployee(id));
+    } catch (_) {}
   }
 
   // --- ADVANCED ATTENDANCE SYSTEM ---
@@ -2646,6 +2658,7 @@ class GarageRepository extends ChangeNotifier {
       _employees[idx] = updated;
       try {
         await _db.employeesBox.put(updated.id, updated.toMap());
+        _triggerAutoSync();
       } catch (_) {}
       notifyListeners();
     }
@@ -2665,6 +2678,7 @@ class GarageRepository extends ChangeNotifier {
       _employees[idx] = updated;
       try {
         await _db.employeesBox.put(updated.id, updated.toMap());
+        _triggerAutoSync();
       } catch (_) {}
       notifyListeners();
     }

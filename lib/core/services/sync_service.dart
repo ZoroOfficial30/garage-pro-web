@@ -6,6 +6,8 @@ import '../../data/database/database_service.dart';
 import '../../data/models/customer.dart';
 import '../../data/models/bay_job.dart';
 import '../../data/models/transaction_record.dart';
+import '../../data/models/stock_item.dart';
+import '../../data/models/employee.dart';
 import '../../data/repositories/garage_repository.dart';
 
 class SyncService extends ChangeNotifier {
@@ -62,6 +64,16 @@ class SyncService extends ChangeNotifier {
       }
       if (_db.transactionsBox.isOpen) {
         count += _db.transactionsBox.values
+            .where((m) => m['isSynced'] != true)
+            .length;
+      }
+      if (_db.stockItemsBox.isOpen) {
+        count += _db.stockItemsBox.values
+            .where((m) => m['isSynced'] != true)
+            .length;
+      }
+      if (_db.employeesBox.isOpen) {
+        count += _db.employeesBox.values
             .where((m) => m['isSynced'] != true)
             .length;
       }
@@ -212,6 +224,42 @@ class SyncService extends ChangeNotifier {
             }
           }
         }
+
+        // 4. Stock Items (Inventory)
+        if (_db.stockItemsBox.isOpen) {
+          final unsyncedStock = _db.stockItemsBox.values
+              .where((m) => m['isSynced'] != true)
+              .map((m) => StockItem.fromMap(m))
+              .toList();
+
+          for (final item in unsyncedStock) {
+            try {
+              await c.from('stock_items').upsert(item.toSupabaseMap(user.id));
+              final updated = item.copyWith(isSynced: true);
+              await _db.stockItemsBox.put(updated.id, updated.toMap());
+            } catch (e) {
+              debugPrint('Failed to sync stock item ${item.id}: $e');
+            }
+          }
+        }
+
+        // 5. Employees (Staff)
+        if (_db.employeesBox.isOpen) {
+          final unsyncedEmp = _db.employeesBox.values
+              .where((m) => m['isSynced'] != true)
+              .map((m) => Employee.fromMap(m))
+              .toList();
+
+          for (final emp in unsyncedEmp) {
+            try {
+              await c.from('employees').upsert(emp.toSupabaseMap(user.id));
+              final updated = emp.copyWith(isSynced: true);
+              await _db.employeesBox.put(updated.id, updated.toMap());
+            } catch (e) {
+              debugPrint('Failed to sync employee ${emp.id}: $e');
+            }
+          }
+        }
       } while (_hasPendingPush);
 
       _lastSyncTime = DateTime.now();
@@ -304,6 +352,52 @@ class SyncService extends ChangeNotifier {
         }
       }
 
+      // 4. Pull Stock Items (Inventory)
+      if (_db.stockItemsBox.isOpen) {
+        final List<dynamic> remoteStock =
+            await c.from('stock_items').select().eq('user_id', user.id);
+
+        for (final raw in remoteStock) {
+          if (raw is Map) {
+            final remoteItem = StockItem.fromMap(Map<String, dynamic>.from(raw));
+            final localMap = _db.stockItemsBox.get(remoteItem.id);
+            if (localMap == null) {
+              await _db.stockItemsBox
+                  .put(remoteItem.id, remoteItem.copyWith(isSynced: true).toMap());
+            } else {
+              final localItem = StockItem.fromMap(localMap);
+              if (remoteItem.updatedAt.isAfter(localItem.updatedAt)) {
+                await _db.stockItemsBox.put(
+                    remoteItem.id, remoteItem.copyWith(isSynced: true).toMap());
+              }
+            }
+          }
+        }
+      }
+
+      // 5. Pull Employees (Staff)
+      if (_db.employeesBox.isOpen) {
+        final List<dynamic> remoteEmployees =
+            await c.from('employees').select().eq('user_id', user.id);
+
+        for (final raw in remoteEmployees) {
+          if (raw is Map) {
+            final remoteEmp = Employee.fromMap(Map<String, dynamic>.from(raw));
+            final localMap = _db.employeesBox.get(remoteEmp.id);
+            if (localMap == null) {
+              await _db.employeesBox
+                  .put(remoteEmp.id, remoteEmp.copyWith(isSynced: true).toMap());
+            } else {
+              final localEmp = Employee.fromMap(localMap);
+              if (remoteEmp.updatedAt.isAfter(localEmp.updatedAt)) {
+                await _db.employeesBox.put(
+                    remoteEmp.id, remoteEmp.copyWith(isSynced: true).toMap());
+              }
+            }
+          }
+        }
+      }
+
       _lastSyncTime = DateTime.now();
 
       // Refresh memory cache in active repository
@@ -373,6 +467,28 @@ class SyncService extends ChangeNotifier {
       await c.from('transactions').delete().eq('id', txId).eq('user_id', user.id);
     } catch (e) {
       debugPrint('SyncService.deleteRemoteTransaction error: $e');
+    }
+  }
+
+  Future<void> deleteRemoteStockItem(String itemId) async {
+    final c = client;
+    final user = currentCloudUser;
+    if (c == null || user == null) return;
+    try {
+      await c.from('stock_items').delete().eq('id', itemId).eq('user_id', user.id);
+    } catch (e) {
+      debugPrint('SyncService.deleteRemoteStockItem error: $e');
+    }
+  }
+
+  Future<void> deleteRemoteEmployee(String empId) async {
+    final c = client;
+    final user = currentCloudUser;
+    if (c == null || user == null) return;
+    try {
+      await c.from('employees').delete().eq('id', empId).eq('user_id', user.id);
+    } catch (e) {
+      debugPrint('SyncService.deleteRemoteEmployee error: $e');
     }
   }
 
