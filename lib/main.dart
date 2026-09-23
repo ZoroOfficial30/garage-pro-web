@@ -47,6 +47,12 @@ void main() async {
     debugPrint('GarageRepository.loadAllData error: $e\n$st');
   }
 
+  // Cold Start Lock Enforcement:
+  // If an owner profile exists and PIN lock is enabled, enforce LockScreen on initial startup
+  if (garageRepo.isGarageSetupCompleted && garageRepo.pinLockEnabled) {
+    garageRepo.lockApp();
+  }
+
   // Initialize SyncService connectivity monitor & attach repository
   final syncService = SyncService();
   syncService.attachRepository(garageRepo);
@@ -72,7 +78,8 @@ void main() async {
 
 class GarageAccountingApp extends StatefulWidget {
   final DateTime Function()? clock;
-  const GarageAccountingApp({super.key, this.clock});
+  final bool? enforceColdStartLock;
+  const GarageAccountingApp({super.key, this.clock, this.enforceColdStartLock});
 
   @override
   State<GarageAccountingApp> createState() => _GarageAccountingAppState();
@@ -88,6 +95,16 @@ class _GarageAccountingAppState extends State<GarageAccountingApp> with WidgetsB
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _triggerAutoSync();
+    if (widget.enforceColdStartLock == true) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          final repo = Provider.of<GarageRepository>(context, listen: false);
+          if (repo.isGarageSetupCompleted && repo.pinLockEnabled && !repo.isAppLocked) {
+            repo.lockApp();
+          }
+        }
+      });
+    }
   }
 
   @override

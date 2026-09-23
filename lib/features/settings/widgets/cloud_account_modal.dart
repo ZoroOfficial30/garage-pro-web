@@ -59,16 +59,27 @@ class _CloudAccountSheetState extends State<_CloudAccountSheet> {
   }
 
   Future<void> _handleAuth(SyncService syncService, AppLocaleManager locale) async {
-    final email = _emailController.text.trim();
+    final identifier = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (email.isEmpty || !email.contains('@') || !email.contains('.')) {
-      setState(() {
-        _errorMessage = locale.isBangla
-            ? 'সঠিক ইমেল ঠিকানা লিখুন'
-            : 'Please enter a valid email address';
-      });
-      return;
+    if (_isSignUpMode) {
+      if (identifier.isEmpty || !identifier.contains('@') || !identifier.contains('.')) {
+        setState(() {
+          _errorMessage = locale.isBangla
+              ? 'সঠিক ইমেল ঠিকানা লিখুন'
+              : 'Please enter a valid email address';
+        });
+        return;
+      }
+    } else {
+      if (identifier.isEmpty || (!identifier.contains('@') && identifier.length < 6)) {
+        setState(() {
+          _errorMessage = locale.isBangla
+              ? 'সঠিক ইমেল বা ফোন নম্বর লিখুন'
+              : 'Please enter a valid email or phone number';
+        });
+        return;
+      }
     }
 
     if (password.length < 6) {
@@ -100,7 +111,7 @@ class _CloudAccountSheetState extends State<_CloudAccountSheet> {
 
     try {
       if (_isSignUpMode) {
-        final res = await syncService.signUp(email, password);
+        final res = await syncService.signUp(identifier, password);
         if (!mounted) return;
         if (res?.session == null) {
           setState(() {
@@ -125,7 +136,7 @@ class _CloudAccountSheetState extends State<_CloudAccountSheet> {
           }
         }
       } else {
-        await syncService.signIn(email, password);
+        await syncService.signIn(identifier, password);
         if (!mounted) return;
         setState(() {
           _isLoading = false;

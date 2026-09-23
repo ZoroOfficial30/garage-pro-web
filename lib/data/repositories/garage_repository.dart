@@ -190,12 +190,12 @@ class GarageRepository extends ChangeNotifier {
   bool get isOwner => _currentUser == null ? true : _currentUser!.isOwner;
   bool get isStaff => _currentUser?.isStaff ?? false;
   String get ownerPin => _getSetting('pin_code', '1234') as String;
-  bool get isGarageSetupCompleted => _getSetting('garage_setup_completed', true) as bool;
+  bool get isGarageSetupCompleted => _getSetting('garage_setup_completed', false) as bool;
   bool _isAppLocked = false;
   bool get isAppLocked => _isAppLocked;
 
   void lockApp() {
-    if (_currentUser != null && !_isAppLocked) {
+    if (!_isAppLocked) {
       _isAppLocked = true;
       notifyListeners();
     }
@@ -216,6 +216,7 @@ class GarageRepository extends ChangeNotifier {
   Future<void> completeFreshSetup({
     required String name,
     required String pin,
+    String? email,
   }) async {
     final cleanPin = pin.trim().isNotEmpty ? pin.trim() : '1234';
     final cleanName = name.trim().isNotEmpty ? name.trim() : 'Apex Auto Workshop';
@@ -226,18 +227,25 @@ class GarageRepository extends ChangeNotifier {
       taxId: workshopProfile['taxId'] ?? 'VAT-89210-AUTO',
       address: workshopProfile['address'] ?? 'Industrial Bay 4, Workshop St',
     );
+    if (email != null && email.trim().isNotEmpty) {
+      await _putSetting('owner_email', email.trim());
+    }
     await setOwnerPin(cleanPin);
     await _putSetting('garage_setup_completed', true);
     await loadAllData();
     await loginOwner(cleanPin);
+    unlockApp();
     _triggerAutoSync();
     notifyListeners();
   }
 
-  Future<void> completeCloudRestoreSetup() async {
+  Future<void> completeCloudRestoreSetup({String? devicePin}) async {
+    final pinToUse = devicePin?.trim().isNotEmpty == true ? devicePin!.trim() : ownerPin;
+    await setOwnerPin(pinToUse);
     await _putSetting('garage_setup_completed', true);
     await loadAllData();
-    await loginOwner(ownerPin);
+    await loginOwner(pinToUse);
+    unlockApp();
     notifyListeners();
   }
 

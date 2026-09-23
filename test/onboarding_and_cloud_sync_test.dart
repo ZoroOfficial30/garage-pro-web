@@ -42,44 +42,45 @@ void main() {
   }
 
   group('1. Onboarding Screen UI & Modal Tests', () {
-    testWidgets('OnboardingScreen renders header, option cards, and language toggle', (tester) async {
+    testWidgets('OnboardingScreen renders header, dual option cards, and language toggle', (tester) async {
       await tester.pumpWidget(createTestWidget(const OnboardingScreen()));
       await tester.pumpAndSettle();
 
       expect(find.text('Garage Accounting Pro'), findsOneWidget);
-      expect(find.text('Start Fresh Garage'), findsOneWidget);
-      expect(find.text('Restore from Cloud'), findsOneWidget);
+      expect(find.text('Create New Workshop'), findsWidgets);
+      expect(find.text('Sign In to Existing Account'), findsWidgets);
       expect(find.text('NEW WORKSHOP'), findsOneWidget);
       expect(find.text('MULTI-DEVICE'), findsOneWidget);
-      expect(find.text('Setup New Garage'), findsOneWidget);
-      expect(find.text('Log In & Restore'), findsOneWidget);
 
       // Toggle language to Bengali
       await tester.tap(find.byIcon(Icons.translate_rounded));
       await tester.pumpAndSettle();
 
       expect(find.text('গ্যারেজ অ্যাকাউন্টিং প্রো'), findsOneWidget);
-      expect(find.text('নতুন গ্যারেজ শুরু করুন'), findsOneWidget);
-      expect(find.text('ক্লাউড থেকে রিস্টোর করুন'), findsOneWidget);
+      expect(find.text('নতুন ওয়ার্কশপ তৈরি করুন'), findsWidgets);
+      expect(find.text('পূর্বের অ্যাকাউন্টে সাইন ইন করুন'), findsOneWidget);
     });
 
-    testWidgets('Start Fresh Garage button opens setup sheet with validation', (tester) async {
+    testWidgets('Create New Workshop button opens setup sheet with validation', (tester) async {
       final repo = GarageRepository();
       await tester.pumpWidget(createTestWidget(const OnboardingScreen(), repo: repo));
       await tester.pumpAndSettle();
 
-      // Tap Setup New Garage
-      await tester.tap(find.text('Setup New Garage'));
+      // Tap Create New Workshop button
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Create New Workshop'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Setup New Garage'), findsWidgets);
+      expect(find.text('Create New Workshop'), findsWidgets);
       expect(find.text('Workshop Name'), findsOneWidget);
+      expect(find.text('Owner Email (Cloud Recovery)'), findsOneWidget);
       expect(find.text('Owner PIN (4-6 digits)'), findsOneWidget);
       expect(find.text('Confirm PIN'), findsOneWidget);
       expect(find.text('Create Garage & Enter Dashboard'), findsOneWidget);
 
       // Submit valid setup
-      await tester.tap(find.text('Create Garage & Enter Dashboard'));
+      final submitBtn = find.text('Create Garage & Enter Dashboard');
+      await tester.ensureVisible(submitBtn);
+      await tester.tap(submitBtn);
       await tester.pumpAndSettle();
 
       expect(repo.isGarageSetupCompleted, isTrue);
@@ -87,18 +88,20 @@ void main() {
       expect(repo.isOwner, isTrue);
     });
 
-    testWidgets('Restore from Cloud button opens CloudAccountModal', (tester) async {
+    testWidgets('Sign In to Existing Account button opens credentials sheet', (tester) async {
       await tester.pumpWidget(createTestWidget(const OnboardingScreen()));
       await tester.pumpAndSettle();
 
-      // Ensure visible and tap Log In & Restore
-      await tester.ensureVisible(find.text('Log In & Restore'));
-      await tester.tap(find.text('Log In & Restore'));
+      // Ensure visible and tap Sign In to Existing Account button
+      final signInBtn = find.widgetWithText(OutlinedButton, 'Sign In to Existing Account');
+      await tester.ensureVisible(signInBtn);
+      await tester.tap(signInBtn);
       await tester.pumpAndSettle();
 
-      expect(find.text('Cloud Account & Multi-Device Sync'), findsOneWidget);
-      expect(find.text('Log In'), findsOneWidget);
-      expect(find.text('Create Account'), findsOneWidget);
+      expect(find.text('Sign In to Existing Account'), findsWidgets);
+      expect(find.text('Email or Phone'), findsOneWidget);
+      expect(find.text('Password'), findsOneWidget);
+      expect(find.text('Sign In & Restore Data'), findsOneWidget);
     });
   });
 
@@ -314,6 +317,44 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.byType(MainScaffold), findsOneWidget);
+    });
+
+    testWidgets('Cold Start Lock Enforcement: boots to LoginScreen when profile exists & PIN enabled', (tester) async {
+      final repo = GarageRepository();
+      await repo.setGarageSetupCompleted(true);
+      await repo.loginOwner(repo.ownerPin);
+      expect(repo.isAuthenticated, isTrue);
+
+      // In production main(), cold-start lock is enforced on startup
+      repo.lockApp();
+      expect(repo.isAppLocked, isTrue);
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<GarageRepository>.value(value: repo),
+            ChangeNotifierProvider<CurrencyManager>(create: (_) => CurrencyManager()),
+            ChangeNotifierProvider<AppLocaleManager>(create: (_) => AppLocaleManager()),
+            ChangeNotifierProvider<SyncService>.value(value: SyncService()),
+          ],
+          child: const GarageAccountingApp(),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // Dashboard must NOT be visible; LoginScreen (LockScreen) must be rendered
+      expect(find.byType(LoginScreen), findsOneWidget);
+      expect(find.byType(MainScaffold), findsNothing);
+      expect(repo.isAppLocked, isTrue);
+
+      // Entering PIN unlocks and reveals Dashboard
+      await repo.unlockWithPin(repo.ownerPin);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.byType(MainScaffold), findsOneWidget);
+      expect(repo.isAppLocked, isFalse);
     });
   });
 }

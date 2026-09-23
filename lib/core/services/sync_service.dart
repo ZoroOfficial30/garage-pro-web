@@ -101,7 +101,11 @@ class SyncService extends ChangeNotifier {
     }
   }
 
-  Future<AuthResponse?> signUp(String email, String password) async {
+  Future<AuthResponse?> signUp(
+    String email,
+    String password, {
+    Map<String, dynamic>? data,
+  }) async {
     final c = client;
     if (c == null) throw Exception('Supabase client is not initialized.');
     _syncError = null;
@@ -109,6 +113,7 @@ class SyncService extends ChangeNotifier {
       final res = await c.auth.signUp(
         email: email.trim(),
         password: password,
+        data: data,
       );
       notifyListeners();
       return res;
@@ -119,15 +124,24 @@ class SyncService extends ChangeNotifier {
     }
   }
 
-  Future<AuthResponse?> signIn(String email, String password) async {
+  Future<AuthResponse?> signIn(String identifier, String password) async {
     final c = client;
     if (c == null) throw Exception('Supabase client is not initialized.');
     _syncError = null;
     try {
-      final res = await c.auth.signInWithPassword(
-        email: email.trim(),
-        password: password,
-      );
+      final clean = identifier.trim();
+      final AuthResponse res;
+      if (clean.contains('@')) {
+        res = await c.auth.signInWithPassword(
+          email: clean,
+          password: password,
+        );
+      } else {
+        res = await c.auth.signInWithPassword(
+          phone: clean,
+          password: password,
+        );
+      }
       notifyListeners();
       if (res.user != null) {
         await pullRemoteData();
@@ -395,6 +409,23 @@ class SyncService extends ChangeNotifier {
               }
             }
           }
+        }
+      }
+
+      // 6. Pull Workshop Profile & Settings from user metadata if present
+      final meta = user.userMetadata;
+      if (meta != null && _db.settingsBox.isOpen) {
+        if (meta['workshop_name'] != null && meta['workshop_name'].toString().trim().isNotEmpty) {
+          await _db.settingsBox.put('profile_name', meta['workshop_name'].toString().trim());
+        }
+        if (meta['phone'] != null && meta['phone'].toString().trim().isNotEmpty) {
+          await _db.settingsBox.put('profile_phone', meta['phone'].toString().trim());
+        }
+        if (meta['tax_id'] != null && meta['tax_id'].toString().trim().isNotEmpty) {
+          await _db.settingsBox.put('profile_tax_id', meta['tax_id'].toString().trim());
+        }
+        if (meta['address'] != null && meta['address'].toString().trim().isNotEmpty) {
+          await _db.settingsBox.put('profile_address', meta['address'].toString().trim());
         }
       }
 
