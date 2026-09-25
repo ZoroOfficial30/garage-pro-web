@@ -9,7 +9,6 @@ import '../../home/widgets/action_confirmation_card.dart';
 import '../widgets/kpi_card.dart';
 import '../widgets/weekly_cash_flow_chart.dart';
 import '../../navigation/widgets/drawer_helper.dart';
-import '../../employees/screens/employees_screen.dart';
 import '../../settings/screens/settings_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -47,6 +46,8 @@ class DashboardScreen extends StatelessWidget {
       resizeToAvoidBottomInset: true,
       drawer: buildAppDrawer(context),
       appBar: AppBar(
+        centerTitle: false,
+        titleSpacing: 8,
         leading: Navigator.canPop(context)
             ? IconButton(
                 icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
@@ -58,8 +59,10 @@ class DashboardScreen extends StatelessWidget {
             : buildDrawerHamburgerButton(context),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(
                   Icons.garage_rounded,
@@ -67,17 +70,23 @@ class DashboardScreen extends StatelessWidget {
                   size: 22,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  locale.translate('executive_dashboard'),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 19,
+                Flexible(
+                  child: Text(
+                    locale.translate('executive_dashboard'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 18,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 2),
             Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
                   width: 7,
@@ -88,12 +97,16 @@ class DashboardScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 5),
-                Text(
-                  dateStr,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondary,
+                Flexible(
+                  child: Text(
+                    dateStr,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ),
               ],
@@ -108,27 +121,15 @@ class DashboardScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            tooltip: locale.isBangla ? 'স্টাফ ও বেতন' : 'Staff & Attendance',
-            icon: const Icon(Icons.badge_outlined, color: AppColors.textPrimary),
-            onPressed: () {
-              if (onNavigateToStaff != null) {
-                onNavigateToStaff!();
-              } else {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const EmployeesScreen()),
-                );
-              }
-            },
-          ),
-          IconButton(
             tooltip: locale.translate('settings'),
-            icon: const Icon(Icons.settings_outlined),
+            icon: const Icon(Icons.settings, color: AppColors.textPrimary),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const SettingsScreen()),
               );
             },
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: SingleChildScrollView(
